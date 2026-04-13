@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Professeur {
+  id                Int      @id @default(autoincrement())
+  prenom            String
+  nom               String
+  email             String   @unique
+  telephone         String?
+  instrumentPrincipal String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  cours             Cours[]
+}
+
+model Eleve {
+  id            Int      @id @default(autoincrement())
+  prenom        String
+  nom           String
+  email         String   @unique
+  telephone     String?
+  dateNaissance DateTime
+  niveau        String   // DEBUTANT, INTERMEDIAIRE, AVANCE
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cours         Cours[]
+}
+
+model Instrument {
+  id           Int      @id @default(autoincrement())
+  code         String   @unique
+  nom          String
+  statut       String   @default("DISPONIBLE") // DISPONIBLE, EN_PRET, HORS_SERVICE
+  valeurEstimee Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  cours        Cours[]
+}
+
+model Cours {
+  id           Int      @id @default(autoincrement())
+  eleveId      Int
+  professeurId Int
+  instrumentId Int
+  dateHeure    DateTime
+  duree        Int      // en minutes
+  statut       String   @default("PLANIFIE") // PLANIFIE, EFFECTUE, ANNULE
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  eleve        Eleve       @relation(fields: [eleveId], references: [id])
+  professeur   Professeur  @relation(fields: [professeurId], references: [id])
+  instrument   Instrument  @relation(fields: [instrumentId], references: [id])
+}
