@@ -2,7 +2,7 @@
 const { z } = require('zod');
 
 const idParamSchema = z.object({
-  id: z.string().regex(/^\d+$/, 'ID doit être un entier').transform(Number),
+  id: z.string().regex(/^\d+$/, 'ID doit être uehhjjwn entier').transform(Number),
 });
 
 module.exports = { idParamSchema };
