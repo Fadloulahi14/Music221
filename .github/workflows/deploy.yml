@@ -35,6 +35,19 @@ jobs:
             echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Create deploy env file
+        env:
+          NODE_ENV: production
+          PORT: ${{ secrets.CONTAINER_PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          printf '%s\n' \
+            "NODE_ENV=$NODE_ENV" \
+            "PORT=$PORT" \
+            "DATABASE_URL=$DATABASE_URL" \
+            "DIRECT_URL=$DIRECT_URL" > .env.deploy
+
       - name: Prepare SSH key
         run: |
           mkdir -p ~/.ssh
@@ -49,6 +62,7 @@ jobs:
           SSH_KEY: ~/.ssh/id_rsa
           IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
           IMAGE_TAG: ${{ steps.ref.outputs.sha }}
+          APP_NAME: MUSIC 221
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
           HOST_PORT: ${{ secrets.HOST_PORT }}
           CONTAINER_PORT: ${{ secrets.CONTAINER_PORT }}

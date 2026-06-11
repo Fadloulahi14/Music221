@@ -58,7 +58,7 @@ Required environment variables:
 
 Optional environment variables:
   SSH_PORT, SSH_KEY, IMAGE_TAG, CONTAINER_NAME, HOST_PORT, CONTAINER_PORT
-  APP_URL, HEALTH_PATH, FALLBACK_HEALTH_PATH, APP_ENV_FILE
+  APP_URL, HEALTH_PATH, FALLBACK_HEALTH_PATH, APP_ENV_FILE, APP_NAME
   SLACK_WEBHOOK_URL, NODE_ENV
 EOF
 }
@@ -88,7 +88,7 @@ send_notification() {
   local message="$3"
 
   if [[ -z "${SLACK_WEBHOOK_URL:-}" ]]; then
-    log_warn "SLACK_WEBHOOK_URL is not set, notification skipped."
+    log_warn "SLACK_WEBHOOK_URL is not set, testons notification skipped."
     return 0
   fi
 
@@ -96,9 +96,11 @@ send_notification() {
   now="$(timestamp)"
 
   if [[ "$status" == "success" ]]; then
-    printf -v text '✅ Statut : Succès\nImage : %s:%s\nHeure : %s\nURL : %s' "$IMAGE_NAME" "$IMAGE_TAG" "$now" "$APP_URL"
+    printf -v text '✅ Projet : %s\nStatut : Succès\nImage : %s:%s\nHeure : %s\nURL : %s' \
+      "$APP_NAME" "$IMAGE_NAME" "$IMAGE_TAG" "$now" "$APP_URL"
   else
-    printf -v text '❌ Statut : Échec\nÉtape : %s\nMessage : %s\nHeure : %s' "$stage" "$message" "$now"
+    printf -v text '❌ Projet : %s\nStatut : Échec\nÉtape : %s\nMessage : %s\nHeure : %s' \
+      "$APP_NAME" "$stage" "$message" "$now"
   fi
 
   payload="{\"text\":\"$(json_escape "$text")\"}"
@@ -182,6 +184,7 @@ NODE_ENV="${NODE_ENV:-production}"
 APP_URL="${APP_URL:-http://${SSH_HOST}:${HOST_PORT}}"
 APP_URL="${APP_URL%/}"
 APP_ENV_FILE="${APP_ENV_FILE:-$SCRIPT_DIR/.env}"
+APP_NAME="${APP_NAME:-MUSIC 221}"
 
 SSH_KEY="${SSH_KEY/#\~/$HOME}"
 REMOTE_TARGET="${SSH_USER}@${SSH_HOST}"
