@@ -11,6 +11,9 @@ jobs:
     name: Build & Push to Docker Hub
     runs-on: ubuntu-latest
 
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
+
     steps:
       # 1. Récupérer le code source
       - name: Checkout code
@@ -37,20 +40,19 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            fadloulahi14/music221:${{ github.sha }}
-            fadloulahi14/music221:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
           # Cache GitHub Actions pour accélérer les builds suivants
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 5. Message de succès avec le SHA du commit
       - name: Success — image pushed
         run: |
           echo "✅ Image Docker poussée avec succès !"
           echo ""
           echo "Tags publiés sur Docker Hub :"
-          echo "  → fadloulahi14/music221:${{ github.sha }}"
-          echo "  → fadloulahi14/music221:latest"
+          echo "  → ${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "  → ${{ env.IMAGE_NAME }}:latest"
           echo ""
           echo "Commit : ${{ github.sha }}"
           echo "Branche : ${{ github.ref_name }}"
